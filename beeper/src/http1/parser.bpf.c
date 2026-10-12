@@ -11,9 +11,9 @@ const u16 s_any = 1;
 
 // The action kinds and flags. User space defines them in http1/action.rs and
 // loads them before the program is loaded.
-u8 HTTP1A_START_CAPTURE;
-u8 HTTP1A_END_CAPTURE;
-u8 HTTP1F_DONE;
+volatile const u8 HTTP1A_START_CAPTURE;
+volatile const u8 HTTP1A_END_CAPTURE;
+volatile const u8 HTTP1F_DONE;
 
 // A single action of the DFA.
 struct http1_action {
