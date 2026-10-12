@@ -18,7 +18,7 @@ struct resp_match {
 };
 
 // The result of parsing a single message, holding one entry per match id the
-// parser was configured with. It is what `matched` and `extract_match` read the
+// parser was configured with. It is what `matched` and `get_match` read the
 // captured ranges out of.
 struct resp2_parse_res {
     struct resp_match ms[MAX_MATCHES];

@@ -50,17 +50,17 @@ struct {
 
 // The functions beeper replaces with a parser when a test attaches one.
 BEEPER_MATCHED(matched_http1)
-BEEPER_EXTRACT_MATCH_MSG(extract_http1_match_msg)
+BEEPER_GET_MATCH_MSG(get_http1_match_msg)
 BEEPER_HTTP1_PARSE_MSG(parse_http1_msg)
 
 BEEPER_MATCHED(matched_http2)
-BEEPER_EXTRACT_MATCH_MSG(extract_http2_match_msg)
+BEEPER_GET_MATCH_MSG(get_http2_match_msg)
 BEEPER_HTTP2_PARSE_MSG(parse_http2_msg)
 
-BEEPER_EXTRACT_MATCH_SKB(extract_http1_match_skb)
+BEEPER_GET_MATCH_SKB(get_http1_match_skb)
 BEEPER_HTTP1_PARSE_SKB(parse_http1_skb)
 
-BEEPER_EXTRACT_MATCH_SKB(extract_http2_match_skb)
+BEEPER_GET_MATCH_SKB(get_http2_match_skb)
 BEEPER_HTTP2_PARSE_SKB(parse_http2_skb)
 
 extern void *bpf_cast_to_kern_ctx(void *obj) __ksym;
@@ -97,7 +97,7 @@ static __always_inline void store_matched(const struct http_parse_res *pres, boo
     last_matches = mask;
 }
 
-// Stores the value `extract` found for the match `i` in `matches`, or clears
+// Stores the value `get` found for the match `i` in `matches`, or clears
 // the match if there is none.
 static __always_inline void store_match(u32 i, int res, const struct bytes *str) {
     if (res != 0) {
@@ -181,7 +181,7 @@ int msg_verdict(struct sk_msg_md *msg) {
         u32 i = 0;
         bpf_for(i, 0, 32) {
             struct bytes str = { 0 };
-            int res = is_h2 ? extract_http2_match_msg(msg, &pres, i, &str) : extract_http1_match_msg(msg, &pres, i, &str);
+            int res = is_h2 ? get_http2_match_msg(msg, &pres, i, &str) : get_http1_match_msg(msg, &pres, i, &str);
             store_match(i, res, &str);
         }
     }
@@ -297,7 +297,7 @@ int skb_verdict(struct __sk_buff *skb) {
         u32 i = 0;
         bpf_for(i, 0, 32) {
             struct bytes str = { 0 };
-            int res = is_h2 ? extract_http2_match_skb(skb, &pres, i, &str) : extract_http1_match_skb(skb, &pres, i, &str);
+            int res = is_h2 ? get_http2_match_skb(skb, &pres, i, &str) : get_http1_match_skb(skb, &pres, i, &str);
             store_match(i, res, &str);
         }
     }

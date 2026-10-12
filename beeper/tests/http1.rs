@@ -110,7 +110,7 @@ fn attach_http1_parser(
     let h1 = h1
         .matched_fn("matched_http1")
         .parse_fn(format!("parse_http1_{suffix}"), hook.into())
-        .extract_fn(format!("extract_http1_match_{suffix}"), hook.into());
+        .get_fn(format!("get_http1_match_{suffix}"), hook.into());
 
     (h1.attach(prog_fd).expect("attach parser"), mids)
 }

@@ -11,7 +11,7 @@ char LICENSE[] SEC("license") = "GPL";
 // The number of bytes a parser walks at most.
 #define MAX_BYTES 0x7FFF
 
-// The number of matches a any parser can extract.
+// The number of matches a any parser can get.
 #define MAX_MATCHES 32
 #define MAX_MATCH_MASK 31
 
@@ -31,7 +31,7 @@ struct ip4_conn {
 // A borrowed string, pointing either into the parsed message or into a
 // data structure internal to the parser. It is only valid for as long
 // as the program does not invalidate the pointers of the message it was
-// extracted from.
+// geted from.
 struct bytes {
     u32 len;
     const u8* ptr;

@@ -28,8 +28,8 @@ struct http_parse_res {
         return ret;                                                                                \
     }
 
-    // Declares a stub for the extract function for SK_MSG.
-#define BEEPER_EXTRACT_MATCH_MSG(name)                                                             \
+    // Declares a stub for the get function for SK_MSG.
+#define BEEPER_GET_MATCH_MSG(name)                                                             \
     __noinline int name(const struct sk_msg_md *msg, const struct http_parse_res *pres __arg_nonnull,   \
                         u8 idx, struct bytes *str __arg_nonnull) {                                 \
         int ret = -1;                                                                              \
@@ -43,8 +43,8 @@ struct http_parse_res {
         return ret;                                                                                \
     }
 
-// Declares a stub for the extract function for SK_SKB.
-#define BEEPER_EXTRACT_MATCH_SKB(name)                                                             \
+// Declares a stub for the get function for SK_SKB.
+#define BEEPER_GET_MATCH_SKB(name)                                                             \
     __noinline int name(const struct __sk_buff *skb, const struct http_parse_res *pres __arg_nonnull,   \
                         u8 idx, struct bytes *str __arg_nonnull) {                                 \
         int ret = -1;                                                                              \

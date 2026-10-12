@@ -197,7 +197,7 @@ bool matched(const struct http_parse_res *pres __arg_nonnull, u8 idx) {
 // Returns 0 on success, -1 if nothing was captured for `idx` or if the range
 // lies outside of the part of the message the program can read.
 SEC("freplace")
-int extract_match_msg(const struct sk_msg_md *msg, const struct http_parse_res *pres __arg_nonnull, u8 idx, struct bytes* str __arg_nonnull) {
+int get_match_msg(const struct sk_msg_md *msg, const struct http_parse_res *pres __arg_nonnull, u8 idx, struct bytes* str __arg_nonnull) {
     if (idx >= MAX_MATCHES) return -1;
 
     struct http_match m = pres->ms[idx & MAX_MATCH_MASK];
@@ -214,11 +214,11 @@ int extract_match_msg(const struct sk_msg_md *msg, const struct http_parse_res *
     return 0;
 }
 
-// Same as `extract_match`, for a match taken out of an sk_buff. The range
+// Same as `get_match`, for a match taken out of an sk_buff. The range
 // points into `skb`, so it is only valid until the program invalidates its data
 // pointers.
 SEC("freplace")
-int extract_match_skb(const struct __sk_buff *skb, const struct http_parse_res *pres __arg_nonnull, u8 idx, struct bytes* str __arg_nonnull) {
+int get_match_skb(const struct __sk_buff *skb, const struct http_parse_res *pres __arg_nonnull, u8 idx, struct bytes* str __arg_nonnull) {
     if (idx >= MAX_MATCHES) return -1;
 
     struct http_match m = pres->ms[idx & MAX_MATCH_MASK];

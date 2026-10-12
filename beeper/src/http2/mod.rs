@@ -29,7 +29,7 @@
 //!
 //! let parser = parser
 //!     .parse_fn("parse_http2", MessageBuffer::Msg)
-//!     .extract_fn("extract_http2_match", MessageBuffer::Msg)
+//!     .get_fn("get_http2_match", MessageBuffer::Msg)
 //!     .get_dynamic_table_entry("get_dt_entry")
 //!     .attach(prog_fd)?;
 //! # Ok(())
@@ -45,7 +45,7 @@
 //! volatile const u8 user_agent_mid;
 //!
 //! BEEPER_HTTP2_PARSE_MSG(parse_http2)
-//! BEEPER_EXTRACT_MATCH_MSG(extract_http2_match)
+//! BEEPER_GET_MATCH_MSG(get_http2_match)
 //!
 //! SEC("sk_msg")
 //! int msg_verdict(struct sk_msg_md *msg) {
@@ -54,7 +54,7 @@
 //!     if (parse_http2(msg, &pres, &frame) < 0) return SK_PASS;
 //!
 //!     struct bytes user_agent = { 0 };
-//!     if (extract_http2_match(msg, &pres, user_agent_mid, &user_agent) == 0) {
+//!     if (get_http2_match(msg, &pres, user_agent_mid, &user_agent) == 0) {
 //!         // user_agent.ptr points to the user_agent.len bytes of the value
 //!     }
 //!
@@ -67,8 +67,8 @@ use std::net::SocketAddr;
 mod action;
 mod hpack;
 mod parser;
-pub use parser::{AttachedParser, DynamicTableInfo, Parser};
 use parser::ip4_addr;
+pub use parser::{AttachedParser, DynamicTableInfo, Parser};
 
 impl From<SocketAddr> for ip4_addr {
     /// Converts `addr` into the address the BPF programs key their per

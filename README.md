@@ -47,7 +47,7 @@ rodata.h2_content_length_mid = content_length_mid.into();
 
 let h2 = h2
     .parse_fn("parse_http2", MessageBuffer::Msg)
-    .extract_fn("extract_http2_match", MessageBuffer::Msg)
+    .get_fn("get_http2_match", MessageBuffer::Msg)
     .attach(prog_fd)?;
 ```
 
@@ -56,7 +56,7 @@ Next, in your eBPF program, import the header of the protocol you parse, define 
 #include "beeper/http2.h"
 
 // stub funcs
-BEEPER_EXTRACT_MATCH_MSG(extract_http2_match)
+BEEPER_GET_MATCH_MSG(get_http2_match)
 BEEPER_HTTP2_PARSE_MSG(parse_http2)
 
 // the match ids the parser handed back, set by user space
@@ -70,7 +70,7 @@ int msg_verdict(struct sk_msg_md *msg) {
     int msg_len = parse_http2(msg, &pres, &frame);
     if (msg_len >= 0) {
         struct bytes path = { 0 };
-        if (extract_http2_match(msg, &pres, h2_path_mid, &path) == 0) {
+        if (get_http2_match(msg, &pres, h2_path_mid, &path) == 0) {
             // note that path can be Huffman-encoded
         }
     }

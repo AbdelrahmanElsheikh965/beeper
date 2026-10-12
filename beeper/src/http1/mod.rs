@@ -26,7 +26,7 @@
 //!
 //! let parser = parser
 //!     .parse_fn("parse_http1", MessageBuffer::Msg)
-//!     .extract_fn("extract_http1_match", MessageBuffer::Msg)
+//!     .get_fn("get_http1_match", MessageBuffer::Msg)
 //!     .attach(prog_fd)?;
 //! # Ok(())
 //! # }
@@ -41,7 +41,7 @@
 //! volatile const u8 user_agent_mid;
 //!
 //! BEEPER_HTTP1_PARSE_MSG(parse_http1)
-//! BEEPER_EXTRACT_MATCH_MSG(extract_http1_match)
+//! BEEPER_GET_MATCH_MSG(get_http1_match)
 //!
 //! SEC("sk_msg")
 //! int msg_verdict(struct sk_msg_md *msg) {
@@ -49,7 +49,7 @@
 //!     if (parse_http1(msg, &pres) < 0) return SK_PASS;
 //!
 //!     struct bytes user_agent = { 0 };
-//!     if (extract_http1_match(msg, &pres, user_agent_mid, &user_agent) == 0) {
+//!     if (get_http1_match(msg, &pres, user_agent_mid, &user_agent) == 0) {
 //!         // user_agent.ptr points to the user_agent.len bytes of the value
 //!     }
 //!

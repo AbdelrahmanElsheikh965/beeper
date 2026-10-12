@@ -39,8 +39,8 @@ pub struct Parser {
     /// The matched function name. It is agnostic to the message buffer.
     matched_fn: Option<String>,
 
-    /// The extract function name for each message buffer.
-    extract_fns: HashMap<MessageBuffer, String>,
+    /// The get function name for each message buffer.
+    get_fns: HashMap<MessageBuffer, String>,
 
     /// The match id of every header captured so far, lowercased as the parser
     /// matches it, so that a header asked for twice is captured once.
@@ -60,7 +60,7 @@ impl Parser {
             num_matches: 0,
             parse_fns: HashMap::new(),
             matched_fn: None,
-            extract_fns: HashMap::new(),
+            get_fns: HashMap::new(),
             captures: HashMap::new(),
         }
     }
@@ -79,10 +79,10 @@ impl Parser {
         self
     }
 
-    /// Specifies the function template in the target program to be called when extracting
+    /// Specifies the function template in the target program to be called when geting
     /// matched content. The function will not be replaced until `attach` is called.
-    pub fn extract_fn<S: ToString>(mut self, extract_fn: S, msg_buf: MessageBuffer) -> Parser {
-        self.extract_fns.insert(msg_buf, extract_fn.to_string());
+    pub fn get_fn<S: ToString>(mut self, get_fn: S, msg_buf: MessageBuffer) -> Parser {
+        self.get_fns.insert(msg_buf, get_fn.to_string());
         self
     }
 
@@ -182,7 +182,7 @@ impl Parser {
     /// Loads the configured parser and attaches it to the target program.
     ///
     /// Every function configured with [`Parser::parse_fn`],
-    /// [`Parser::matched_fn`] or [`Parser::extract_fn`] is replaced in the
+    /// [`Parser::matched_fn`] or [`Parser::get_fn`] is replaced in the
     /// target program, the remaining parser programs are left
     /// unloaded. The parser always stops at the end of the header block, no
     /// matter which patterns were configured.
@@ -223,10 +223,10 @@ impl Parser {
             prog.set_attach_target(target, Some(func.clone()))?;
         }
 
-        for (msg_buf, func) in &parser.extract_fns {
+        for (msg_buf, func) in &parser.get_fns {
             let prog = match msg_buf {
-                MessageBuffer::Msg => &mut open_skel.progs.extract_match_msg,
-                MessageBuffer::Skb => &mut open_skel.progs.extract_match_skb,
+                MessageBuffer::Msg => &mut open_skel.progs.get_match_msg,
+                MessageBuffer::Skb => &mut open_skel.progs.get_match_skb,
             };
             prog.set_autoload(true);
             prog.set_attach_target(target, Some(func.clone()))?;
@@ -250,10 +250,10 @@ impl Parser {
             links.push(skel.progs.matched.attach()?);
         }
 
-        for msg_buf in parser.extract_fns.keys() {
+        for msg_buf in parser.get_fns.keys() {
             links.push(match msg_buf {
-                MessageBuffer::Msg => skel.progs.extract_match_msg.attach()?,
-                MessageBuffer::Skb => skel.progs.extract_match_skb.attach()?,
+                MessageBuffer::Msg => skel.progs.get_match_msg.attach()?,
+                MessageBuffer::Skb => skel.progs.get_match_skb.attach()?,
             });
         }
 

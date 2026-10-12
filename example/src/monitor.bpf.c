@@ -46,11 +46,11 @@ volatile const u8 h1_status_mid;
 
 // The functions beeper replaces with an HTTP/1.1 parser.
 BEEPER_MATCHED(matched_http1)
-BEEPER_EXTRACT_MATCH_MSG(extract_http1_match)
+BEEPER_GET_MATCH_MSG(get_http1_match)
 BEEPER_HTTP1_PARSE_MSG(parse_http1)
 
 // The function beeper replaces with an HTTP/2 parser. Its header fields are
-// not captured, so there is no extract stub to replace.
+// not captured, so there is no get stub to replace.
 BEEPER_HTTP2_PARSE_MSG(parse_http2)
 
 // The size of the buffer a value is copied into before it is logged.
@@ -90,11 +90,11 @@ static __always_inline void log_http1_request(struct sk_msg_md *msg, struct http
     if (!scratch) return;
 
     struct bytes path = { 0 };
-    if (extract_http1_match(msg, pres, h1_path_mid, &path) < 0) return;
+    if (get_http1_match(msg, pres, h1_path_mid, &path) < 0) return;
     copy_bounded(path.ptr, path.len, scratch->a);
 
     struct bytes lang = { 0 };
-    if (extract_http1_match(msg, pres, h1_accept_language_mid, &lang) == 0) {
+    if (get_http1_match(msg, pres, h1_accept_language_mid, &lang) == 0) {
         copy_bounded(lang.ptr, lang.len, scratch->b);
         bpf_debug("--> %s accept-language: %s", scratch->a, scratch->b);
     } else {
@@ -110,7 +110,7 @@ static __always_inline void log_http1_response(struct sk_msg_md *msg, struct htt
     if (!scratch) return;
 
     struct bytes status = { 0 };
-    if (extract_http1_match(msg, pres, h1_status_mid, &status) < 0) return;
+    if (get_http1_match(msg, pres, h1_status_mid, &status) < 0) return;
     copy_bounded(status.ptr, status.len, scratch->a);
 
     copy_bounded((u8 *)(long)msg->data + hdr_len, msg->size - hdr_len, scratch->b);

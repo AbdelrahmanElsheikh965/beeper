@@ -350,7 +350,7 @@ static __always_inline bool _is_valid_hpack_index(const struct dynamic_table_inf
 // itself or, if the peer only referenced the field by index, in the static or
 // the dynamic table. `is_key` selects the name of a table entry over its value.
 // `*out` is left untouched if the match cannot be resolved.
-static __always_inline void _extract_match(const struct msg_ctx *ctx, const struct http_match *m, bool is_key, u8 **out, u32 *len, bool *huff) {
+static __always_inline void _get_match(const struct msg_ctx *ctx, const struct http_match *m, bool is_key, u8 **out, u32 *len, bool *huff) {
     if (m->in_msg) {
         if (ctx->data + m->idx + m->len > ctx->data_end) return;
         *out = ctx->data + m->idx;
@@ -516,13 +516,13 @@ static __always_inline int _add_dynamic_table_entry(const struct msg_ctx *ctx __
     u8 *key_ptr = NULL;
     u32 key_len = 0;
     bool key_huff = false;
-    _extract_match(ctx, key, true, &key_ptr, &key_len, &key_huff);
+    _get_match(ctx, key, true, &key_ptr, &key_len, &key_huff);
     if (!key_ptr) return -1;
 
     u8 *val_ptr = NULL;
     u32 val_len = 0;
     bool val_huff = false;
-    _extract_match(ctx, val, false, &val_ptr, &val_len, &val_huff);
+    _get_match(ctx, val, false, &val_ptr, &val_len, &val_huff);
     if (!val_ptr) return -1;
 
     // an entry only keeps the first `HEADER_FIELD_MAXLEN` bytes of a field, but
@@ -1087,10 +1087,10 @@ int get_dt_entry(const struct ip4_conn *conn __arg_nonnull, u32 idx, struct http
 
 // Points `str` at the value captured for the match `m`, resolving it against
 // `ctx`. Returns 0 on success, -1 if the value cannot be resolved.
-static __always_inline int _extract_str(const struct msg_ctx *ctx, const struct http_match *m, struct bytes *str) {
+static __always_inline int _get_str(const struct msg_ctx *ctx, const struct http_match *m, struct bytes *str) {
     u8 *ptr = NULL;
     u32 len = 0;
-    _extract_match(ctx, m, false, &ptr, &len, NULL);
+    _get_match(ctx, m, false, &ptr, &len, NULL);
     if (ptr == NULL) return -1;
 
     *str = (struct bytes) {
@@ -1115,24 +1115,24 @@ bool matched(const struct http_parse_res *pres __arg_nonnull, u8 idx) {
 // Returns 0 on success, -1 if nothing was captured for `idx` or if the value
 // can no longer be resolved.
 SEC("freplace")
-int extract_match_msg(const struct sk_msg_md *msg, const struct http_parse_res *pres __arg_nonnull, u8 idx, struct bytes *str __arg_nonnull) {
+int get_match_msg(const struct sk_msg_md *msg, const struct http_parse_res *pres __arg_nonnull, u8 idx, struct bytes *str __arg_nonnull) {
     if (idx >= MAX_MATCHES) return -1;
 
     struct http_match m = pres->ms[idx & MAX_MATCH_MASK];
     if (m.len == 0) return -1;
 
     struct msg_ctx ctx = _new_msg_ctx(msg);
-    return _extract_str(&ctx, &m, str);
+    return _get_str(&ctx, &m, str);
 }
 
-// Same as `extract_match`, for a match taken out of an sk_buff.
+// Same as `get_match`, for a match taken out of an sk_buff.
 SEC("freplace")
-int extract_match_skb(const struct __sk_buff *skb, const struct http_parse_res *pres __arg_nonnull, u8 idx, struct bytes *str __arg_nonnull) {
+int get_match_skb(const struct __sk_buff *skb, const struct http_parse_res *pres __arg_nonnull, u8 idx, struct bytes *str __arg_nonnull) {
     if (idx >= MAX_MATCHES) return -1;
 
     struct http_match m = pres->ms[idx & MAX_MATCH_MASK];
     if (m.len == 0) return -1;
 
     struct msg_ctx ctx = _new_skb_ctx(skb);
-    return _extract_str(&ctx, &m, str);
+    return _get_str(&ctx, &m, str);
 }

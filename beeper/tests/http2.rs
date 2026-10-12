@@ -316,14 +316,18 @@ fn attach_http1_parser(prog_fd: i32, hook: Hook) -> http1::AttachedParser {
     let suffix = hook.to_string();
     h1.matched_fn("matched_http1")
         .parse_fn(format!("parse_http1_{suffix}"), hook.into())
-        .extract_fn(format!("extract_http1_match_{suffix}"), hook.into())
+        .get_fn(format!("get_http1_match_{suffix}"), hook.into())
         .attach(prog_fd)
         .expect("attach parser")
 }
 
 /// Attaches a parser capturing `hdrs` and returns it along with the match id
 /// of each of them, in the order they were configured in.
-fn attach_http2_parser(prog_fd: i32, hook: Hook, hdrs: &[&str]) -> (http2::AttachedParser, Vec<MatchId>) {
+fn attach_http2_parser(
+    prog_fd: i32,
+    hook: Hook,
+    hdrs: &[&str],
+) -> (http2::AttachedParser, Vec<MatchId>) {
     let mut h2 = http2::Parser::new();
 
     let mut mids = Vec::new();
@@ -337,7 +341,7 @@ fn attach_http2_parser(prog_fd: i32, hook: Hook, hdrs: &[&str]) -> (http2::Attac
     let suffix = hook.to_string();
     let h2 = h2
         .parse_fn(format!("parse_http2_{suffix}"), hook.into())
-        .extract_fn(format!("extract_http2_match_{suffix}"), hook.into())
+        .get_fn(format!("get_http2_match_{suffix}"), hook.into())
         .attach(prog_fd)
         .expect("attach parser");
 

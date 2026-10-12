@@ -46,8 +46,8 @@ pub struct Parser {
     /// The matched function name. It is agnostic to the message buffer.
     matched_fn: Option<String>,
 
-    /// The extract function name for each message buffer.
-    extract_fns: HashMap<MessageBuffer, String>,
+    /// The get function name for each message buffer.
+    get_fns: HashMap<MessageBuffer, String>,
 
     /// The function name to retrieve dynamic table entries.
     get_dynamic_table_entry_fn: Option<String>,
@@ -72,7 +72,7 @@ impl Parser {
             num_matches: 0,
             parse_fns: HashMap::new(),
             matched_fn: None,
-            extract_fns: HashMap::new(),
+            get_fns: HashMap::new(),
             get_dynamic_table_entry_fn: None,
             captures: HashMap::new(),
         }
@@ -114,7 +114,7 @@ impl Parser {
         self
     }
 
-    /// Specifies the name of the stub function defined with `BEEPER_EXTRACT_MATCH_*`
+    /// Specifies the name of the stub function defined with `BEEPER_GET_MATCH_*`
     /// in the target program. When calling [`], Beeper will insert its logic
     /// into the given template using the
     /// [BPF_PROG_TYPE_EXT](https://docs.ebpf.io/linux/program-type/BPF_PROG_TYPE_EXT/)
@@ -125,10 +125,10 @@ impl Parser {
     /// ```
     /// use beeper::{MessageBuffer, http2};
     ///
-    /// let parser = http2::Parser::new().extract_fn("extract_http2_match", MessageBuffer::Msg);
+    /// let parser = http2::Parser::new().get_fn("get_http2_match", MessageBuffer::Msg);
     /// ```
-    pub fn extract_fn<S: ToString>(mut self, extract_fn: S, msg_buf: MessageBuffer) -> Parser {
-        self.extract_fns.insert(msg_buf, extract_fn.to_string());
+    pub fn get_fn<S: ToString>(mut self, get_fn: S, msg_buf: MessageBuffer) -> Parser {
+        self.get_fns.insert(msg_buf, get_fn.to_string());
         self
     }
 
@@ -270,7 +270,7 @@ impl Parser {
     /// Loads the configured parser and attaches it to the target program.
     ///
     /// Every function configured with [`Parser::parse_fn`],
-    /// [`Parser::matched_fn`] or [`Parser::extract_fn`] is replaced in the
+    /// [`Parser::matched_fn`] or [`Parser::get_fn`] is replaced in the
     /// target program, the remaining parser programs are left
     /// unloaded.
     ///
@@ -292,7 +292,7 @@ impl Parser {
     ///
     /// let parser = parser
     ///     .parse_fn("parse_http2", MessageBuffer::Msg)
-    ///     .extract_fn("extract_http2_match", MessageBuffer::Msg)
+    ///     .get_fn("get_http2_match", MessageBuffer::Msg)
     ///     .get_dynamic_table_entry("get_dt_entry")
     ///     .attach(prog_fd)?;
     /// # Ok(())
@@ -327,10 +327,10 @@ impl Parser {
             prog.set_attach_target(target, Some(func.clone()))?;
         }
 
-        for (msg_buf, func) in &self.extract_fns {
+        for (msg_buf, func) in &self.get_fns {
             let prog = match msg_buf {
-                MessageBuffer::Msg => &mut open_skel.progs.extract_match_msg,
-                MessageBuffer::Skb => &mut open_skel.progs.extract_match_skb,
+                MessageBuffer::Msg => &mut open_skel.progs.get_match_msg,
+                MessageBuffer::Skb => &mut open_skel.progs.get_match_skb,
             };
             prog.set_autoload(true);
             prog.set_attach_target(target, Some(func.clone()))?;
@@ -360,10 +360,10 @@ impl Parser {
             links.push(skel.progs.matched.attach()?);
         }
 
-        for msg_buf in self.extract_fns.keys() {
+        for msg_buf in self.get_fns.keys() {
             links.push(match msg_buf {
-                MessageBuffer::Msg => skel.progs.extract_match_msg.attach()?,
-                MessageBuffer::Skb => skel.progs.extract_match_skb.attach()?,
+                MessageBuffer::Msg => skel.progs.get_match_msg.attach()?,
+                MessageBuffer::Skb => skel.progs.get_match_skb.attach()?,
             });
         }
 

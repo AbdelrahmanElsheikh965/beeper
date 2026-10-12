@@ -90,7 +90,7 @@ impl<'obj> Monitor<'obj> {
         let h1 = h1
             .parse_fn("parse_http1", MessageBuffer::Msg)
             .matched_fn("matched_http1")
-            .extract_fn("extract_http1_match", MessageBuffer::Msg)
+            .get_fn("get_http1_match", MessageBuffer::Msg)
             .attach(prog_fd)?;
 
         let h2 = http2::Parser::new()

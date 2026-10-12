@@ -20,7 +20,7 @@
 //!
 //! let parser = parser
 //!     .parse_fn("parse_http1", MessageBuffer::Msg)
-//!     .extract_fn("extract_http1_match", MessageBuffer::Msg)
+//!     .get_fn("get_http1_match", MessageBuffer::Msg)
 //!     .attach(prog_fd)?;
 //! # Ok(())
 //! # }
@@ -181,7 +181,7 @@ pub(crate) struct StateId(u16);
 /// Identifies a captured range in the parse result.
 ///
 /// It is the index the target program passes to the functions replaced with
-/// `Parser::matched_fn` and `Parser::extract_fn`. Captures are
+/// `Parser::matched_fn` and `Parser::get_fn`. Captures are
 /// numbered in the order in which they are configured.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct MatchId(u8);
