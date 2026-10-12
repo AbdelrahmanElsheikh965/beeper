@@ -12,7 +12,7 @@
 
 // The index the first entry of a dynamic table is stored under. User space
 // defines it in http2/parser.rs and loads it before the program is loaded.
-u32 DYNAMIC_TABLE_BASE;
+volatile const u32 DYNAMIC_TABLE_BASE;
 
 // The identifier of the SETTINGS parameter announcing the size of the dynamic
 // table.
@@ -95,28 +95,28 @@ struct {
 
 // The state ids, action kinds and flags. User space defines them in
 // http2/action.rs and loads them before the program is loaded.
-u16 S_DEAD;
-u16 S_FIELD;
-u16 S_VAL_LEN;
-u16 S_NAME;
+volatile const u16 S_DEAD;
+volatile const u16 S_FIELD;
+volatile const u16 S_VAL_LEN;
+volatile const u16 S_NAME;
 
 // Nothing.
 #define HTTP2A_NONE 0
 
-u8 HTTP2A_INDEXED;
-u8 HTTP2A_IDX_NAME;
-u8 HTTP2A_LIT_NAME;
-u8 HTTP2A_KEY_LEN;
-u8 HTTP2A_VAL_LEN;
-u8 HTTP2A_TABLE_SIZE;
-u8 HTTP2A_INT_START;
-u8 HTTP2A_INT_CONT;
-u8 HTTP2A_CAPTURE;
-u8 HTTP2A_ERR;
+volatile const u8 HTTP2A_INDEXED;
+volatile const u8 HTTP2A_IDX_NAME;
+volatile const u8 HTTP2A_LIT_NAME;
+volatile const u8 HTTP2A_KEY_LEN;
+volatile const u8 HTTP2A_VAL_LEN;
+volatile const u8 HTTP2A_TABLE_SIZE;
+volatile const u8 HTTP2A_INT_START;
+volatile const u8 HTTP2A_INT_CONT;
+volatile const u8 HTTP2A_CAPTURE;
+volatile const u8 HTTP2A_ERR;
 
-u8 HTTP2F_HUFF;
-u8 HTTP2F_ADD_DT;
-u8 HTTP2F_CONT;
+volatile const u8 HTTP2F_HUFF;
+volatile const u8 HTTP2F_ADD_DT;
+volatile const u8 HTTP2F_CONT;
 
 // A single action of the DFA. `val` is an index, a length or a table size,
 // depending on `kind`.

@@ -433,7 +433,7 @@ impl Parser {
     /// Returns an error if the DFA exceeds the eBPF limits on the number
     /// of states, edges, or actions.
     fn inject(&self, skel: &mut OpenParserSkel) -> Result<(), Error> {
-        load_bss!(skel, HTTP1A_START_CAPTURE, HTTP1A_END_CAPTURE, HTTP1F_DONE);
+        load_rodata!(skel, HTTP1A_START_CAPTURE, HTTP1A_END_CAPTURE, HTTP1F_DONE);
 
         let Some(data) = skel.maps.rodata_data.as_mut() else {
             panic!("the parser program has no read-only data to inject into");

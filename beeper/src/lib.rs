@@ -34,16 +34,17 @@ use httlib_huffman::EncoderError;
 use std::fmt::Display;
 use xbpf::libbpf_rs;
 
-/// Loads Rust constants into the equally named variables of the `bss` section
-/// of an open skeleton. `NAME = value` loads `value` into the variable `NAME`.
-macro_rules! load_bss {
+/// Loads Rust constants into the equally named variables of the `rodata`
+/// section of an open skeleton. `NAME = value` loads `value` into the variable
+/// `NAME`.
+macro_rules! load_rodata {
     (@val $name:ident) => { $name };
     (@val $name:ident, $val:expr) => { $val };
     ($skel:expr, $($name:ident $(= $val:expr)?),+ $(,)?) => {{
-        let Some(bss) = $skel.maps.bss_data.as_mut() else {
-            panic!("the parser program has no bss section to load into");
+        let Some(rodata) = $skel.maps.rodata_data.as_mut() else {
+            panic!("the parser program has no read-only data to load into");
         };
-        $(bss.$name = load_bss!(@val $name $(, $val)?);)+
+        $(rodata.$name = load_rodata!(@val $name $(, $val)?);)+
     }};
 }
 

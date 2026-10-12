@@ -395,7 +395,7 @@ impl Parser {
     /// Returns an error if the DFA exceeds the eBPF limits on the number
     /// of states, edges, or actions.
     fn inject(&self, skel: &mut OpenParserSkel) -> Result<(), Error> {
-        load_bss!(
+        load_rodata!(
             skel,
             DYNAMIC_TABLE_BASE,
             S_DEAD = S_DEAD.0,
