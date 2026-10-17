@@ -1,8 +1,5 @@
 #include "beeper/http.h"
-
-// The HTTP/2 specific part of the interface between a BPF program and the
-// parsers beeper attaches to it. See `beeper/http.h` for the type a parser
-// reports its results in and the stubs every HTTP parser shares.
+#include <asm-generic/errno.h>
 
 #ifndef __BEEPER_HTTP2_H__
 #define __BEEPER_HTTP2_H__
@@ -17,6 +14,13 @@ struct http2_frame {
     // this frame.
     u32 dt_count_before;
     u32 dt_count;
+
+    // The length of the frame's payload, as its header announces it.
+    u32 len;
+
+    // The number of bytes needed to continue parsing. Set when `-EAGAIN`
+    // is returned.
+    u32 need;
 };
 
 // The number of bytes of a name or a value that are kept in a dynamic table

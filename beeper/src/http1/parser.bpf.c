@@ -32,12 +32,12 @@ struct http1_action {
 // The edges of the DFA, indexed by state and input byte, along with their
 // actions. User space fills both in before the program is loaded, after
 // which they are read-only.
-volatile const struct trans s2ts[MAX_STATES][MAX_EDGES];
-volatile const struct http1_action a2as[MAX_ACTIONS];
+volatile const struct trans states[MAX_STATES][MAX_EDGES];
+volatile const struct http1_action actions[MAX_ACTIONS];
 
 // Reads the action an edge carries. Edge 0 leads to the fallback state.
 static __always_inline struct http1_action _action(u16 id) {
-    return a2as[id & (MAX_ACTIONS - 1)];
+    return actions[id & (MAX_ACTIONS - 1)];
 }
 
 // Follows the edge `input` takes out of `state`. A state that has no
@@ -46,9 +46,9 @@ static __always_inline struct http1_action _action(u16 id) {
 static __always_inline void _next(u16 state, u8 input, u16 *next_state, u16 *action) {
     state &= MAX_STATES - 1;
 
-    struct trans t = s2ts[state][input];
+    struct trans t = states[state][input];
     if (t.state == 0 && t.action == 0) {
-        t = s2ts[state][ANY_EDGE];
+        t = states[state][ANY_EDGE];
         if (t.state == 0 && t.action == 0) {
             *next_state = s_any;
             *action = 0;
@@ -110,7 +110,7 @@ static __always_inline int _parse_from(u8 *data, u8 *data_end, u16 start, struct
             ms[mid] = (struct http_match) {
                 .idx = cidx[mid],
                 .len = i - cidx[mid] + 1,
-                .in_msg = true
+                .source = HTTP_SRC_MSG
             };
         }
 
