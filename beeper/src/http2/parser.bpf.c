@@ -686,7 +686,7 @@ static __always_inline struct http2_parse_state _new_http2_parse_state(u8 src) {
 // Runs the action of the edges `ps` holds.
 //
 // Returns 0, or -1 if the block cannot be read any further.
-__noinline __weak int _run_action(const struct msg_ctx *ctx __arg_nonnull, struct dynamic_table_info *dt_info __arg_nonnull, struct http_parse_res *pres __arg_nonnull, struct http2_parse_state *ps __arg_nonnull) {
+static __always_inline int _run_action(const struct msg_ctx *ctx __arg_nonnull, struct dynamic_table_info *dt_info __arg_nonnull, struct http_parse_res *pres __arg_nonnull, struct http2_parse_state *ps __arg_nonnull) {
     u32 v = ps->v & MAX_BYTES;
 
     bpf_trace("hdr: %d: kind %d, val %d", ps->i, ps->kind, v);
