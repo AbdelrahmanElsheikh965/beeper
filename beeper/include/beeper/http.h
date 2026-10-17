@@ -3,11 +3,24 @@
 #ifndef __BEEPER_HTTP_H__
 #define __BEEPER_HTTP_H__
 
+// Where the bytes of a captured header field are.
+enum http_match_source {
+    // In the message that was parsed: `idx` is the offset they start at.
+    HTTP_SRC_MSG = 0,
+
+    // In an entry of the HPACK static or dynamic table: `idx` addresses it.
+    HTTP_SRC_TABLE = 1,
+
+    // In the per-CPU buffer used when a header spans across multiple CONTINUATION frames.
+    HTTP_SRC_BUF = 2,
+};
+
 // A single captured header field.
 struct http_match {
     u16 idx;
     u16 len;
-    bool in_msg;
+    // an `enum http_match_source`
+    u8 source;
     bool huff;
 };
 
