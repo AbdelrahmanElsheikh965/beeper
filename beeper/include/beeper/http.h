@@ -19,7 +19,6 @@ enum http_match_source {
 struct http_match {
     u16 idx;
     u16 len;
-    // an `enum http_match_source`
     u8 source;
     bool huff;
 };

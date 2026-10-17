@@ -241,9 +241,7 @@ mod tests {
     use crate::{MatchId, StateId};
     use std::collections::HashSet;
 
-    /// Returns the states a representation is walked with. `S_DEAD` and the
-    /// roots of the name tries are left out, as it is the patterns that give
-    /// those their transitions.
+    /// Returns the states a literal representation is walked with.
     fn representation_states() -> Vec<StateId> {
         (S_FIELD.0..S_RESERVED)
             .map(StateId)
