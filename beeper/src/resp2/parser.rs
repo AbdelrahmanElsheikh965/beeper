@@ -271,10 +271,10 @@ impl Parser {
         };
 
         let num_states = self.dfa.num_states() as usize;
-        if num_states > data.s2ts.len() {
+        if num_states > data.states.len() {
             warn!(
                 "the patterns take {num_states} states, the parser holds {}",
-                data.s2ts.len()
+                data.states.len()
             );
             return Err(Error::ParserExceedsStateLimit);
         }
@@ -286,17 +286,17 @@ impl Parser {
         for (from, input, to, action) in self.dfa.iter_transitions() {
             let new_action_idx = action_idx.len();
             let action = *action_idx.entry(action).or_insert(new_action_idx);
-            if action >= data.a2as.len() {
+            if action >= data.actions.len() {
                 warn!(
                     "the patterns take more actions than the {} the parser holds",
-                    data.a2as.len()
+                    data.actions.len()
                 );
                 return Err(Error::ParserExceedsStateLimit);
             }
 
             let action = action as u16;
             let input = input as usize;
-            if input >= data.s2ts[0].len() {
+            if input >= data.states[0].len() {
                 warn!("the patterns read inputs the parser has no column for: {input}");
                 return Err(Error::ParserExceedsStateLimit);
             }
@@ -309,7 +309,7 @@ impl Parser {
                 action
             );
 
-            data.s2ts[from.0 as usize][input] = trans {
+            data.states[from.0 as usize][input] = trans {
                 state: to.0,
                 action,
             };
@@ -317,7 +317,7 @@ impl Parser {
 
         for (action, i) in action_idx {
             let Some(action) = action else { continue };
-            data.a2as[i] = action.into();
+            data.actions[i] = action.into();
         }
 
         Ok(())

@@ -158,12 +158,12 @@ struct http2_action {
 // The edges of the DFA, indexed by state and input byte, along with their
 // actions. User space fills both in before the program is loaded, after
 // which they are read-only.
-volatile const struct trans s2ts[MAX_STATES][MAX_EDGES];
-volatile const struct http2_action a2as[MAX_ACTIONS];
+volatile const struct trans states[MAX_STATES][MAX_EDGES];
+volatile const struct http2_action actions[MAX_ACTIONS];
 
 // Reads the action an edge carries. Edge 0 leads to the fallback state.
 static __always_inline struct http2_action _action(u16 id) {
-    return a2as[id & (MAX_ACTIONS - 1)];
+    return actions[id & (MAX_ACTIONS - 1)];
 }
 
 // The length of the longest code of the HPACK Huffman code.
@@ -387,7 +387,7 @@ static __always_inline void _next(u16 state, u8 input, u16 *next_state, u16 *act
     state &= MAX_STATES - 1;
     input &= MAX_EDGES - 1;
 
-    struct trans t = s2ts[state][input];
+    struct trans t = states[state][input];
     if (t.state == 0 && t.action == 0) {
         *next_state = S_DEAD;
         *action = 0;
